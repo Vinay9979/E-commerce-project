@@ -16,8 +16,8 @@ def countCartitems(request):
     id = request.user.id
     try:
         total = Cart.objects.filter(user=id)
-        total  = total.aggregate(total=Count('user'))
-        total = total['total']
+        # total  = total.aggregate(total=Count('user'))
+        total = len(total)
         return{'cartNumber':total}
     except KeyError :
          total =0

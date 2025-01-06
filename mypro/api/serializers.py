@@ -2,11 +2,36 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from client.models import Subcategory,Toy,Category,Billingaddress,Cart
 from adminside.models import Categoryphotos
+from rest_framework.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         exclude = ['password']
+
+
+class userDetailSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length = 100)
+    password = serializers.CharField(max_length = 100)
+
+    def validate(self,data):
+            if User.objects.filter(username = data['username']).exists():
+                raise ValidationError({"Details":"username already exists","username":data['username']})
+            else:
+                try:
+                    validate_password(password=data['password'])
+                    return data
+                except ValidationError as e:
+                    raise ValidationError(e.messages)
+
+    def create(self, validated_data):
+       user =  User.objects.create_user(username = validated_data['username'],password = validated_data['password'])
+       return  user
+
+                
+
+        
 
 class SubcategorySerializer(serializers.ModelSerializer):
     class Meta:

@@ -4,7 +4,7 @@ from client.models import Toy,Category,Billingaddress,Deliveryaddress,Cart
 from . import serializers
 from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
-from django_filters import rest_framework
+# from django_filters import rest_framework
 # from django_filters
 from rest_framework.views import APIView
 from rest_framework import filters
@@ -15,14 +15,27 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 # from rest_framework.exceptions import MethodNotAllowed
 from django.db.models import F,Sum
+from rest_framework import status
 
 
 
 class UserAPI(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self,request):
-        queryset = User.objects.get(id = request.user.id)
-        serializer = serializers.UserSerializer(queryset)
-        return Response(serializer.data)
+        try:
+            queryset = User.objects.get(id = request.user.id)
+            serializer = serializers.UserSerializer(queryset)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'Detail':'No user Found'},status=status.HTTP_404_NOT_FOUND)
+    def post(self,request):
+            data = request.data
+            serializer = serializers.userDetailSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"Details":'user has been created'})
+            else:
+                return Response(serializer.errors)
 
 class ProductViewAPI(viewsets.ReadOnlyModelViewSet):
     queryset = Toy.objects.prefetch_related('categoryId','subcategoryId')
@@ -67,15 +80,12 @@ class CartViewSet(viewsets.ReadOnlyModelViewSet):
         if type(cart_items) == dict:
             return Response({'Details':'No data found.'})
     
-        total = sum(item.subTotal or 0 for item in cart_items) 
+        total  = cart_items.aggregate(total = Sum('product__purchasePrice'))
         
         if total:
-            return Response({'total':total})
+            return Response({'total':total['total']})
         else:
             return Response({'Details':'No data found.'})
-
-    # def retrieve(self, request, *args, **kwargs):
-    #     raise MethodNotAllowed('GET', detail="Retrieve method is not allowed for this viewset.")
     
 
 class CartView(APIView):
@@ -89,8 +99,6 @@ class CartView(APIView):
         else:
             return Response({'Details':'No cart data found.'})
 
-
-    
 
 
 
