@@ -20,14 +20,17 @@ from rest_framework import status
 
 
 class UserAPI(APIView):
-    permission_classes = [IsAuthenticated]
     def get(self,request):
         try:
+            self.permission_classes = [IsAuthenticated]
+            print(request.user.id)
             queryset = User.objects.get(id = request.user.id)
             serializer = serializers.UserSerializer(queryset)
             return Response(serializer.data,status=status.HTTP_200_OK)
         except User.DoesNotExist:
+            print(request.user.id)
             return Response({'Detail':'No user Found'},status=status.HTTP_404_NOT_FOUND)
+        
     def post(self,request):
             data = request.data
             serializer = serializers.userDetailSerializer(data=data)
