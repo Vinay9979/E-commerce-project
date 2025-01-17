@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from client.models import Subcategory,Toy,Category,Billingaddress,Cart
+from rest_framework.authtoken.models import Token
 from adminside.models import Categoryphotos
 from rest_framework.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
@@ -128,6 +129,11 @@ class CartDetailSerializer(serializers.ModelSerializer):
         model = Cart
         fields = '__all__'
 
+class TokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Token
+        fields = '__all__'
+        
 # class CartItemsSerializer(serializers.ModelSerializer):
 #     cart_items = CartDetailSerializer()
 #     total = serializers.DecimalField(max_digits=10,decimal_places=2)

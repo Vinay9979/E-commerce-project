@@ -24,7 +24,6 @@ urlpatterns = [
     path('client/',include('client.urls')),
     path('shopadmin/',include('adminside.urls')),  
     path('api/',include('api.urls')),
-    path('silk/', include('silk.urls', namespace='silk'))
 ]
 
 if settings.DEBUG:

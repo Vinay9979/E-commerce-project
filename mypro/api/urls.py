@@ -3,16 +3,8 @@ from . import views
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register(r'productAPI',views.ProductViewAPI)
-router.register(r'categoryAPI',views.CategoryViewAPI)
-# router.register(r'userAPI',views.UserViewSet)
-router.register(r'cartAPI',views.CartViewSet)
-
-
 
 urlpatterns = [
-    path("",include(router.urls)),
-    path('cartAPIVIEW/',views.CartView.as_view(),name='cartVIew'),
-    path('userAPI/',views.UserAPI.as_view(),name='userAPI')
-
-]
+    path('cartDetails/',views.CartApi.as_view(),name='cart'),
+    path('gettoken/',views.UserAuthApi.as_view(),name='usertoken')
+    ]
