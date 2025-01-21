@@ -46,22 +46,12 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Toy
-        fields= ['id','name','img_url','purchasePrice','description','increasedPrice','categoryName','subcategoryName','categoryId','subcategoryId']
+        # fields= ['id','name','img_url','purchasePrice','description','increasedPrice','categoryName','subcategoryName','categoryId','subcategoryId']
+        fields = ['id','name','img_url','purchasePrice','description','categoryName','subcategoryName','increasedPrice']
+        # exclude = ['categoryId','subcategoryId']
 
     def get_increasedPrice(self,obj):
         return float(obj.purchasePrice)*1.2
-
-    def __init__(self, *args, **kwargs):
-        # Access the 'action' from the context passed from the viewset
-        request = kwargs.get('context', {}).get('request', None)
-        action = kwargs.get('context', {}).get('action', None)  # Get action from context
-
-        if action != 'retrieve':
-            # Remove the 'custom_field' if the action is not 'retrieve' (for list actions)
-            self.fields.pop('description', None)
-
-        super().__init__(*args, **kwargs)
-
 
 class CategorySerializer(serializers.ModelSerializer):
     toyCount = serializers.SerializerMethodField()
@@ -105,23 +95,23 @@ class DeliveryaddressSerializer(serializers.ModelSerializer):
         address = obj.address.split('->')
         return address
 
-class CartSerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField()
-    imgUrl = serializers.SerializerMethodField()
-    price = serializers.SerializerMethodField()
-    class Meta:
-        model = Cart
-        fields = ['id','name','imgUrl','price','quantity','product','subTotal']
+# class CartSerializer(serializers.ModelSerializer):
+#     name = serializers.SerializerMethodField()
+#     imgUrl = serializers.SerializerMethodField()
+#     price = serializers.SerializerMethodField()
+#     class Meta:
+#         model = Cart
+#         fields = ['id','name','imgUrl','price','quantity','product','subTotal']
 
 
-    def get_name(self, obj):
-        return obj.product.name  
+#     def get_name(self, obj):
+#         return obj.product.name  
 
-    def get_imgUrl(self, obj):
-        return obj.product.img_url
+#     def get_imgUrl(self, obj):
+#         return obj.product.img_url
 
-    def get_price(self, obj):
-        return obj.product.purchasePrice
+#     def get_price(self, obj):
+#         return obj.product.purchasePrice
 
 
 class CartDetailSerializer(serializers.ModelSerializer):
@@ -129,18 +119,16 @@ class CartDetailSerializer(serializers.ModelSerializer):
         model = Cart
         fields = '__all__'
 
-class TokenSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Token
-        fields = '__all__'
-        
-# class CartItemsSerializer(serializers.ModelSerializer):
-#     cart_items = CartDetailSerializer()
-#     total = serializers.DecimalField(max_digits=10,decimal_places=2)
-#     # imgUrl = serializers.SerializerMethodField()
-#     # price = serializers.SerializerMethodField()
-#     class Meta:
-#         model = Cart
-#         fields = '__all__'
 
+        
+class CartSerializer(serializers.Serializer):
+    cart_items = CartDetailSerializer(many=True)
+    total = serializers.DecimalField(max_digits=10,decimal_places=2)
+ 
+    class Meta:
+        model = Cart
+        fields = '__all__'
+
+   
+   
 
