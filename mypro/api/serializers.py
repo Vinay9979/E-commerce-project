@@ -18,22 +18,18 @@ class userDetailSerializer(serializers.Serializer):
 
     def validate(self,data):
             if User.objects.filter(username = data['username']).exists():
-                raise ValidationError({"Details":"username already exists","username":data['username']})
+                raise ValidationError({"Details":"username already exists","username":data['username'],'password':data['password']})
             else:
                 try:
                     validate_password(password=data['password'])
                     return data
                 except ValidationError as e:
-                    raise ValidationError(e.messages)
+                    raise ValidationError({'username':data['username'],'password':data['password'],'details':e.messages})
 
     def create(self, validated_data):
        user =  User.objects.create_user(username = validated_data['username'],password = validated_data['password'])
        return  user
-
-                
-
-        
-
+    
 class SubcategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Subcategory
