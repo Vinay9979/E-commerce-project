@@ -35,6 +35,8 @@ class ProductDetailApi(APIView):
             if product.exists():
                 serializer = serializers.ProductSerializer(product.first())
                 return Response(serializer.data)
+            else:
+                return Response({'Details':'No product Found'})
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
 
