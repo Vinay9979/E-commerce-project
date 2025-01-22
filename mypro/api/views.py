@@ -45,14 +45,8 @@ class CartApi(APIView):
     def get(self,request):
         cart_items = Cart.objects.all()
         total = cart_items.aggregate(total = Sum('product__purchasePrice'))
-        serializer = serializers.CartDetailSerializer(cart_items,many=True)
-        print(total)
-
-        return Response(
-            {'cart_items':serializer.data,
-             'total':total['total']
-            }
-        )
+        serializer = serializers.CartSerializer({'total':total['total'],"cart_items":cart_items})
+        return Response(serializer.data)
 
 
 

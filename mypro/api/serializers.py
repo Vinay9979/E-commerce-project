@@ -43,12 +43,10 @@ class ProductSerializer(serializers.ModelSerializer):
     increasedPrice = serializers.SerializerMethodField()
     categoryName = serializers.CharField(source='categoryId.categoryName')
     subcategoryName = serializers.CharField(source='subcategoryId.subcategoryName')
-
+    
     class Meta:
         model = Toy
-        # fields= ['id','name','img_url','purchasePrice','description','increasedPrice','categoryName','subcategoryName','categoryId','subcategoryId']
         fields = ['id','name','img_url','purchasePrice','description','categoryName','subcategoryName','increasedPrice']
-        # exclude = ['categoryId','subcategoryId']
 
     def get_increasedPrice(self,obj):
         return float(obj.purchasePrice)*1.2
@@ -115,20 +113,24 @@ class DeliveryaddressSerializer(serializers.ModelSerializer):
 
 
 class CartDetailSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
+    sub_total = serializers.SerializerMethodField()
+
     class Meta:
         model = Cart
-        fields = '__all__'
+        fields = ['product','sub_total']
 
-
+    
+    def get_sub_total(self,obj):
+        return obj.product.purchasePrice * obj.quantity
         
 class CartSerializer(serializers.Serializer):
-    cart_items = CartDetailSerializer(many=True)
     total = serializers.DecimalField(max_digits=10,decimal_places=2)
- 
-    class Meta:
-        model = Cart
-        fields = '__all__'
+    cart_items = CartDetailSerializer(many=True)
 
+    class meta:
+        fields = ['cart_items','total','quantity']
+    
    
    
 
